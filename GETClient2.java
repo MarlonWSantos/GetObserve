@@ -17,6 +17,7 @@
 package org.eclipse.californium.examples;
 
 import java.io.BufferedReader;
+import java.util.Scanner;
 import java.io.File;
 
 import java.io.FileOutputStream;
@@ -38,7 +39,7 @@ import org.eclipse.californium.core.network.config.NetworkConfig.Keys;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapObserveRelation;
 
-public class GETClient {
+public class GETClient2 {
 
 	private static final File CONFIG_FILE = new File("Californium.properties");
 	private static final String CONFIG_HEADER = "Californium CoAP Properties file for Fileclient";
@@ -54,13 +55,40 @@ public class GETClient {
 			config.setInt(Keys.PREFERRED_BLOCK_SIZE, DEFAULT_BLOCK_SIZE);
 		}
 	};
+	
+	public static void Observer() {
+		CoapClient client = new CoapClient("coap://[aaaa::200:0:0:2]:5683/test/hello");
+		
+		// wait for user
+				System.out.println("Aperte Enter para iniciar: ");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				try { br.readLine(); } catch (IOException e) { }
+				
+				// observe
 
-	/*
-	 * Application entry point.
-	 * 
-	 */	
-	public static void main(String args[]) {
-	/*	NetworkConfig config = NetworkConfig.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS);
+				System.out.println("OBSERVE (press enter to exit)");
+		
+		CoapObserveRelation relation = client.observe(new CoapHandler() {
+			@Override
+		public void onLoad(CoapResponse response) {
+		System.out.println(response.getResponseText());
+		}
+		@Override
+		public void onError() {
+		System.err.println("Failed");
+		}
+		});
+		
+		// wait for user
+				try { br.readLine(); } catch (IOException e) { }
+				
+				System.out.println("CANCELLATION");
+				
+		relation.proactiveCancel();
+	};
+	
+	public static void Get(String[] args) {
+		NetworkConfig config = NetworkConfig.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS);
 		NetworkConfig.setStandard(config);
 		 
 		URI uri = null; // URI parameter of the request
@@ -118,41 +146,36 @@ public class GETClient {
 			System.out.println("Usage : " + GETClient.class.getSimpleName() + " URI [file]");
 			System.out.println("  URI : The CoAP URI of the remote resource to GET");
 			System.out.println("  file: optional filename to save the received payload");
-		}*/
-		
-//*****************************************************************************		
-
-		CoapClient client = new CoapClient("coap://[aaaa::200:0:0:7]:5683/test/push");
-		
-		// wait for user
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-				try { br.readLine(); } catch (IOException e) { }
-				
-				// observe
-
-				System.out.println("OBSERVE (press enter to exit)");
-		
-		CoapObserveRelation relation = client.observe(new CoapHandler() {
-			@Override
-		public void onLoad(CoapResponse response) {
-		System.out.println(response.getResponseText());
 		}
-		@Override
-		public void onError() {
-		System.err.println("Failed");
+	};
+
+	public static void main(String args[]) {
+		Scanner keyboard;
+		keyboard = new Scanner ( System.in );
+		int opcao;
+		System.out.println("Observer ---------- [1]");
+		System.out.println("Get --------------- [2]");
+		System.out.print("Informe um valor: "); 
+		opcao = keyboard.nextInt();
+		System.out.println( "Opção : " + opcao );
+		switch (opcao) {
+		case 1: 
+			Observer();
+			break;
+		case 2:
+			Get(args);
+			break;
+		default:
+			System.out.println("Número inválido");
+			break;
+			/*if (opcao == 1){
+				Observer();
+			}else if(opcao == 2){
+				Get(args);
+			}else{
+				System.exit(0);
+			}*/
 		}
-		});
-		
-		// wait for user
-				try { br.readLine(); } catch (IOException e) { }
-				
-				System.out.println("CANCELLATION");
-				
-		relation.proactiveCancel();
-		
-		
-		
-//*****************************************************************************		
-	}
+		}
 
 }
