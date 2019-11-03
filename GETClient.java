@@ -146,12 +146,10 @@ public class GETClient {
 			System.out.println("Usage : " + GETClient.class.getSimpleName() + " URI [file]");
 			System.out.println("  URI : The CoAP URI of the remote resource to GET");
 			System.out.println("  file: optional filename to save the received payload");
-<<<<<<< HEAD:GETClient.java
-		}*/
-		
-//*****************************************************************************		
+		}
+	}	
 
-		CoapClient client = new CoapClient("coap://"
+		/*CoapClient client = new CoapClient("coap://"
 				+ "californium.eclipse.org:5683/obs");
 		
 		// wait for user
@@ -159,10 +157,8 @@ public class GETClient {
 				try { br.readLine(); } catch (IOException e) { }
 				
 				// observe
-=======
-		}
-	};
->>>>>>> a26cc1f1d8853b78acbfdd437d22cc977dcc1ad6:GETClient2.java
+		}*/
+	
 
 	public static void main(String args[]) {
 		Scanner keyboard;
@@ -183,14 +179,8 @@ public class GETClient {
 		default:
 			System.out.println("Número inválido");
 			break;
-			/*if (opcao == 1){
-				Observer();
-			}else if(opcao == 2){
-				Get(args);
-			}else{
-				System.exit(0);
-			}*/
+			
 		}
 		}
 
-}
+	}
