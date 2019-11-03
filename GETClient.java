@@ -122,7 +122,8 @@ public class GETClient {
 		
 //*****************************************************************************		
 
-		CoapClient client = new CoapClient("coap://[aaaa::200:0:0:7]:5683/test/push");
+		CoapClient client = new CoapClient("coap://"
+				+ "californium.eclipse.org:5683/obs");
 		
 		// wait for user
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
