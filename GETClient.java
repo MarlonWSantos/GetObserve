@@ -126,7 +126,9 @@ public class GETClient {
 		Scanner keyboard;
 		keyboard = new Scanner ( System.in );
 		int opcao;
-		String url = "coap://[aaaa::200:0:0:7]:5683/test/hello";
+		//String url = "coap://[aaaa::200:0:0:7]:5683/test/hello";
+		if (args.length>0) {
+		String url = args[0];
 		System.out.println("Observer ---------- [1]");
 		System.out.println("Get --------------- [2]");
 		System.out.print("Informe um valor: "); 
@@ -141,8 +143,8 @@ public class GETClient {
 			break;
 		default:
 			System.out.println("Número inválido");
-			break;
-			
+			break;			
 		}
+		}else {System.out.println("Faltando a url");}
 	}
 }
