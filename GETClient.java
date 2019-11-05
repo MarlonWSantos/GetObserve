@@ -56,8 +56,8 @@ public class GETClient {
 		}
 	};
 	
-	public static void Observer() {
-		CoapClient client = new CoapClient("coap://[aaaa::200:0:0:2]:5683/test/hello");
+	public static void Observer(String args) {
+		CoapClient client = new CoapClient(args);
 		
 		// wait for user
 				System.out.println("Aperte Enter para iniciar: ");
@@ -70,13 +70,13 @@ public class GETClient {
 		
 		CoapObserveRelation relation = client.observe(new CoapHandler() {
 			@Override
-		public void onLoad(CoapResponse response) {
-		System.out.println(response.getResponseText());
-		}
-		@Override
-		public void onError() {
-		System.err.println("Failed");
-		}
+			public void onLoad(CoapResponse response) {
+				System.out.println(response.getResponseText());
+			}
+			@Override
+			public void onError() {
+				System.err.println("Failed");
+			}
 		});
 		
 		// wait for user
@@ -87,83 +87,46 @@ public class GETClient {
 		relation.proactiveCancel();
 	};
 	
-	public static void Get(String[] args) {
+	public static void Get(String args) {
 		NetworkConfig config = NetworkConfig.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS);
 		NetworkConfig.setStandard(config);
 		 
-		URI uri = null; // URI parameter of the request
-		
-		if (args.length >=0) {
-			
-			// input URI from command line arguments
-			try {
-				//uri = new URI(args[0]);
-				uri = new URI("coap://californium.eclipse.org:5683");
-
-			} catch (URISyntaxException e) {
-				System.err.println("Invalid URI: " + e.getMessage());
-				System.exit(-1);
-			}
-			
-			CoapClient client = new CoapClient(uri);
+		CoapClient client = new CoapClient(args);
 
 			CoapResponse response = null;
-			try {
-				response = client.get();
 				
-			} catch (ConnectorException | IOException e) {
-				System.err.println("Got an error: " + e);
-			}
+				try {
+					response = client.get();
+				} catch (ConnectorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+				if (response!=null) {
 
-			if (response!=null) {
 				
 				System.out.println(response.getCode());
 				System.out.println(response.getOptions());
-				if (args.length > 1) {
-					try (FileOutputStream out = new FileOutputStream(args[1])) {
-						out.write(response.getPayload());
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				} else {
 					System.out.println(response.getResponseText());
 					
 					System.out.println(System.lineSeparator() + "ADVANCED" + System.lineSeparator());
 					// access advanced API with access to more details through
 					// .advanced()
 					System.out.println(Utils.prettyPrint(response));
-				}
-			} else {
-				System.out.println("No response received.");
-			}
-			
-			client.shutdown();
-		} else {
-			// display help
-			System.out.println("Californium (Cf) GET Client");
-			System.out.println("(c) 2014, Institute for Pervasive Computing, ETH Zurich");
-			System.out.println();
-			System.out.println("Usage : " + GETClient.class.getSimpleName() + " URI [file]");
-			System.out.println("  URI : The CoAP URI of the remote resource to GET");
-			System.out.println("  file: optional filename to save the received payload");
-		}
-	}	
-
-		/*CoapClient client = new CoapClient("coap://"
-				+ "californium.eclipse.org:5683/obs");
-		
-		// wait for user
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-				try { br.readLine(); } catch (IOException e) { }
 				
-				// observe
-		}*/
-	
+			}else { }			
+			client.shutdown();
+			}
+		
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		Scanner keyboard;
 		keyboard = new Scanner ( System.in );
 		int opcao;
+		String url = "coap://[aaaa::200:0:0:7]:5683/test/hello";
 		System.out.println("Observer ---------- [1]");
 		System.out.println("Get --------------- [2]");
 		System.out.print("Informe um valor: "); 
@@ -171,16 +134,15 @@ public class GETClient {
 		System.out.println( "Opção : " + opcao );
 		switch (opcao) {
 		case 1: 
-			Observer();
+			Observer(url);
 			break;
 		case 2:
-			Get(args);
+			Get(url);
 			break;
 		default:
 			System.out.println("Número inválido");
 			break;
 			
 		}
-		}
-
 	}
+}
