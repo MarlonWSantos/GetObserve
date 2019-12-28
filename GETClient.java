@@ -57,7 +57,20 @@ public class GETClient {
 	};
 	
 	public static void Observer(String args) {
-		CoapClient client = new CoapClient(args);
+		
+	
+		String url[]= {"coap://[aaaa::200:0:0:2]:5683/test/hello",
+						"coap://[aaaa::200:0:0:3]:5683/test/hello",
+						"coap://[aaaa::200:0:0:4]:5683/test/hello"};
+		int i=0;
+		System.out.println("Url:"+url[i]);
+		CoapClient client = new CoapClient(url[i]);
+		i++;
+		System.out.println("Url:"+url[i]);
+		CoapClient client2 = new CoapClient(url[i]);
+		i++;
+		System.out.println("Url:"+url[i]);
+		CoapClient client3 = new CoapClient(url[i]);
 		
 		// wait for user
 				System.out.println("Aperte Enter para iniciar: ");
@@ -67,7 +80,7 @@ public class GETClient {
 				// observe
 
 				System.out.println("OBSERVE (press enter to exit)");
-		
+					
 		CoapObserveRelation relation = client.observe(new CoapHandler() {
 			@Override
 			public void onLoad(CoapResponse response) {
@@ -79,13 +92,38 @@ public class GETClient {
 			}
 		});
 		
+		CoapObserveRelation relation2 = client2.observe(new CoapHandler() {
+			@Override
+			public void onLoad(CoapResponse response) {
+				System.out.println(response.getResponseText());
+			}
+			@Override
+			public void onError() {
+				System.err.println("Failed");
+			}
+		});
+		
+		CoapObserveRelation relation3 = client3.observe(new CoapHandler() {
+			@Override
+			public void onLoad(CoapResponse response) {
+				System.out.println(response.getResponseText());
+			}
+			@Override
+			public void onError() {
+				System.err.println("Failed");
+			}
+		});
+		
+		
 		// wait for user
 				try { br.readLine(); } catch (IOException e) { }
 				
 				System.out.println("CANCELLATION");
 				
 		relation.proactiveCancel();
+	  
 	};
+	
 	
 	public static void Get(String args) {
 		NetworkConfig config = NetworkConfig.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS);
@@ -121,14 +159,21 @@ public class GETClient {
 			client.shutdown();
 			}
 		
-
+	
+	
 	public static void main(String[] args) {
 		Scanner keyboard;
 		keyboard = new Scanner ( System.in );
 		int opcao;
 		//String url = "coap://[aaaa::200:0:0:7]:5683/test/hello";
-		if (args.length>0) {
-		String url = args[0];
+		//String url = "coap://coap.me/hello";
+		if (args.length==0) {
+		//String url = args[0];
+		//String[] url = new String[2]
+		String url = null;
+		//String url = "coap://[aaaa::200:0:0:2]:5683/test/hello";
+		//String url = "coap://[aaaa::200:0:0:3]:5683/test/hello";
+
 		System.out.println("Observer ---------- [1]");
 		System.out.println("Get --------------- [2]");
 		System.out.print("Informe um valor: "); 
@@ -137,9 +182,11 @@ public class GETClient {
 		switch (opcao) {
 		case 1: 
 			Observer(url);
+
 			break;
 		case 2:
 			Get(url);
+
 			break;
 		default:
 			System.out.println("Número inválido");
