@@ -13,6 +13,11 @@
  * Contributors:
  *    Matthias Kovatsch - creator and main architect
  *    Achim Kraus (Bosch Software Innovations GmbH) - add saving payload
+ *    Marlon W. Santos (Federal University of Pará) - add Observer
+ *                                                  - add Menu
+ *                                                  - add Functions
+ *                                                  - add ErrorMsg
+ *                                                  - add UrlMotes
  ******************************************************************************/
 package org.eclipse.californium.examples;
 
@@ -56,74 +61,6 @@ public class GETClient {
 		}
 	};
 	
-	public static void Observer(String args) {
-		
-	
-		String url[]= {"coap://[aaaa::200:0:0:2]:5683/test/hello",
-						"coap://[aaaa::200:0:0:3]:5683/test/hello",
-						"coap://[aaaa::200:0:0:4]:5683/test/hello"};
-		int i=0;
-		System.out.println("Url:"+url[i]);
-		CoapClient client = new CoapClient(url[i]);
-		i++;
-		System.out.println("Url:"+url[i]);
-		CoapClient client2 = new CoapClient(url[i]);
-		i++;
-		System.out.println("Url:"+url[i]);
-		CoapClient client3 = new CoapClient(url[i]);
-		
-		// wait for user
-				System.out.println("Aperte Enter para iniciar: ");
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-				try { br.readLine(); } catch (IOException e) { }
-				
-				// observe
-
-				System.out.println("OBSERVE (press enter to exit)");
-					
-		CoapObserveRelation relation = client.observe(new CoapHandler() {
-			@Override
-			public void onLoad(CoapResponse response) {
-				System.out.println(response.getResponseText());
-			}
-			@Override
-			public void onError() {
-				System.err.println("Failed");
-			}
-		});
-		
-		CoapObserveRelation relation2 = client2.observe(new CoapHandler() {
-			@Override
-			public void onLoad(CoapResponse response) {
-				System.out.println(response.getResponseText());
-			}
-			@Override
-			public void onError() {
-				System.err.println("Failed");
-			}
-		});
-		
-		CoapObserveRelation relation3 = client3.observe(new CoapHandler() {
-			@Override
-			public void onLoad(CoapResponse response) {
-				System.out.println(response.getResponseText());
-			}
-			@Override
-			public void onError() {
-				System.err.println("Failed");
-			}
-		});
-		
-		
-		// wait for user
-				try { br.readLine(); } catch (IOException e) { }
-				
-				System.out.println("CANCELLATION");
-				
-		relation.proactiveCancel();
-	  
-	};
-	
 	
 	public static void Get(String args) {
 		NetworkConfig config = NetworkConfig.createWithFile(CONFIG_FILE, CONFIG_HEADER, DEFAULTS);
@@ -146,8 +83,8 @@ public class GETClient {
 				if (response!=null) {
 
 				
-				System.out.println(response.getCode());
-				System.out.println(response.getOptions());
+					System.out.println(response.getCode());
+					System.out.println(response.getOptions());
 					System.out.println(response.getResponseText());
 					
 					System.out.println(System.lineSeparator() + "ADVANCED" + System.lineSeparator());
@@ -155,43 +92,124 @@ public class GETClient {
 					// .advanced()
 					System.out.println(Utils.prettyPrint(response));
 				
-			}else { }			
+				}else {
+				System.out.println("No response received.");
+				}			
 			client.shutdown();
 			}
 		
-	
-	
-	public static void main(String[] args) {
+	public static int Menu() {
+		
 		Scanner keyboard;
 		keyboard = new Scanner ( System.in );
-		int opcao;
-		//String url = "coap://[aaaa::200:0:0:7]:5683/test/hello";
-		//String url = "coap://coap.me/hello";
-		if (args.length==0) {
-		//String url = args[0];
-		//String[] url = new String[2]
-		String url = null;
-		//String url = "coap://[aaaa::200:0:0:2]:5683/test/hello";
-		//String url = "coap://[aaaa::200:0:0:3]:5683/test/hello";
-
+		
 		System.out.println("Observer ---------- [1]");
 		System.out.println("Get --------------- [2]");
-		System.out.print("Informe um valor: "); 
-		opcao = keyboard.nextInt();
-		System.out.println( "Opção : " + opcao );
+		System.out.print("Informe um valor: ");
+		
+		return keyboard.nextInt();
+	}
+	
+	public static void ErrorMsg() {
+		System.out.println("Faltando uma URL");
+		System.out.println("Modo de usar:");
+		System.out.println("CoapObserver.jar + coap://[URL]:5683");
+		System.out.println("Mais de uma URL:");
+		System.out.println("CoapObserver.jar + n +coap://[URL]:5683");
+		System.out.println("URL: Endereco remoto do mote");
+		System.out.println("n: Número de motes da rede");
+	}
+	
+	public static void Functions(int opcao,String[] url){
+		
 		switch (opcao) {
 		case 1: 
 			Observer(url);
-
 			break;
 		case 2:
-			Get(url);
-
+			Get(url[0]);
 			break;
 		default:
 			System.out.println("Número inválido");
 			break;			
 		}
-		}else {System.out.println("Faltando a url");}
+		
+	}
+
+	public static void Observer(String[] url) {
+		
+		int i=0;
+			
+		CoapClient[] client = new CoapClient[url.length];
+		
+		for (i=0;i<url.length;i++) {
+			client[i] = new CoapClient(url[i]);
+		}
+		
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+				System.out.println("OBSERVE (press enter to exit)");
+				
+				CoapObserveRelation[] relation = new CoapObserveRelation[url.length];
+				
+				for(i=0;i<url.length;i++) {
+				
+					relation[i] = client[i].observe(new CoapHandler() {
+						@Override
+						public void onLoad(CoapResponse response) {
+							System.out.println(response.getResponseText());
+						}
+						@Override
+						public void onError() {
+							System.err.println("Failed");
+						}
+					});
+				}
+							
+		// wait for user
+				try { br.readLine(); } catch (IOException e) { }
+				
+				System.out.println("CANCELLATION");
+				  
+	};
+
+	public static String[] UrlMotes(String motes,String url) {
+		
+		int NumMotes = Integer.parseInt(motes);
+		String[] ListUrl = new String[NumMotes];
+		String index;
+		
+		for(int i=0;i<NumMotes;i++) {
+			index = String.valueOf(i+2);
+			ListUrl[i] = url.replace(":2]",":"+index+"]");
+		}
+		return ListUrl;
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		int opcao;
+		String[] url = new String[args.length];
+		
+		if (args.length==1) {
+			
+				
+			url[0] = args[0];
+	
+			opcao=Menu();
+
+			Functions(opcao,url);
+	
+		}else if(args.length>1){
+			
+			url = UrlMotes(args[0],args[1]);
+			
+			opcao=Menu();
+
+			Functions(opcao,url);
+						
+		}
+		else{ErrorMsg();}
 	}
 }
